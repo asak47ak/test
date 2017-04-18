@@ -3,7 +3,9 @@
 基于python2.7 
 
 chrome需要提前下载 chromedriver.exe 
+
 firefox下载 geckodriver.exe
+
 ie下载 IEDriverServer.exe
 
 下载好后放在浏览器exe文件夹下
