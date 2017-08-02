@@ -1,18 +1,19 @@
-#! /usr/bin/env python
 # -*- coding=utf-8 -*-
-#3.20 golden 肖申
+#基础浏览器配置
 
 import selenium
 import time
 import os
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common import desired_capabilities
+from selenium.webdriver.opera import options
 
 class Driver(object):
 	__chrome = "C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe"
 	__ie = "C:\Program Files (x86)\Internet Explorer\IEDriverServer.exe"
+	__operaDriverLoc = os.path.abspath('C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe')
+	__operaExeLoc = os.path.abspath('D:\\opera\\46.0.2597.32\\opera.exe')
+	
 	driver = None #webdriver实例
 
 	def __init__(self,url,typefind):
@@ -33,6 +34,13 @@ class Driver(object):
 		self.driver = webdriver.Firefox()
 		self.driver.get(self.url)
 
+	def opera(self):
+		__operaCaps = desired_capabilities.DesiredCapabilities.OPERA.copy()
+		__operaOpts = options.ChromeOptions()
+		__operaOpts._binary_location = self.__operaExeLoc
+		self.driver = webdriver.Chrome(executable_path = self.__operaDriverLoc, chrome_options = __operaOpts, desired_capabilities = __operaCaps)
+		self.driver.get(self.url)
+
 	def open(self):
 		if self.typefind == 'chrome':
 			self.chromedriver()
@@ -40,39 +48,17 @@ class Driver(object):
 			self.ie()
 		elif self.typefind == 'firefox':
 			self.firefox()
+		elif self.typefind == 'opera':
+			self.opera()
 		elif self.typefind == 'all':
 			self.chromedriver()
 			self.ie()
 			self.firefox()
+			self.opera()
 
 	def doit(self):
 		self.open()
-		return self.driver #返回webdriver实例，以便让其它基本调用
+		return self.driver #返回webdriver实例，以便让其它脚本调用
 
-# ch = Driver("file:///C:/Python27/python/test.html","chrome").doit()
-
-
-# ch.save_screenshot('ele.jpg')
-
-# time.sleep(1)
-
-# nowhandle = ch.current_window_handle
-
-# ch.find_element_by_css_selector(".openmodal").click()
-
-# allhandles = ch.window_handles
-
-# for handle in allhandles:
-# 	print 1
-# 	if handle != nowhandle:
-# 		ch.switch_to_window(handle)
-# 		ch.find_element_by_css_selector("button[class='btn btn-default']").click()
-# 		print 2
-
-# time.sleep(1)
-
-# ch.switch_to_window(nowhandle)
-
-# time.sleep(1)
-
-# ch.find_element_by_css_selector("button[class='btn btn-default']").click()
+if __name__ == '__main__':
+	Driver('http://www.baidu.com','opera').doit()
