@@ -14,6 +14,7 @@ ie下载 IEDriverServer.exe
 
 目录结构：
 
+<pre>
 ├─action.py 执行开始脚本
 ├─case 用例目录
 ├─component 组件目录
@@ -24,6 +25,7 @@ ie下载 IEDriverServer.exe
     ├─method.py
     ├─······
     └─log.py
+</pre>
 
 流程：
 输入action.py pramas1: pramas2 pramas3 pramas4 开始逐一执行case目录下的测试脚本，
