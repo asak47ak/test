@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">	
+	<link rel="stylesheet" href="lib/bootstrap.min.css">
+	<script src="lib/vue.js"></script>
+	<script src="lib/axios.js"></script>
+	<title>开始测试</title>
+</head>
+<body>
+	<div class="container">		
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2">
+				<div class="page-header">
+					<h1>开始测试</h1>
+					<h6 class="text-right"><a href="data.html">报告列表</a></h6>
+				</div>
+			</div>
+			<div class="col-md-8 col-md-offset-2">
+				<label class="text-success" for="browser">
+					浏览器
+				</label>
+				<div class="form-group">
+					<select name="browser" id="browser" class="form-control">
+						<option value="chrome">chrome</option>
+						<option value="firefox">firefox</option>
+						<option value="ie">ie</option>
+						<option value="opear" disabled>opear</option>
+						<option value="safari" disabled>safari</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-8 col-md-offset-2">
+				<label class="text-success" for="count">
+					执行选择
+				</label>
+				<div class="form-group">
+					<select id="count" class="form-control" v-model="countt">
+						<option value="all">all</option>
+						<option v-for="op,ind,i in opti" v-bind:value="op">{{ind + 1}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-8 col-md-offset-2">
+				<div class="form-group">
+					<label><input type="checkbox" v-model="picked" checked="checked" v-bind:disabled="conti">选择跳过</label>
+				</div>
+				<div class="form-group">
+					<select id="skip" class="form-control" v-bind:disabled="!picked" v-model="skipco">
+						<option value="0">0</option>
+						<option v-for="opt in opti" v-bind:value="opt">{{opt}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-8 col-md-offset-2">
+				<label class="text-success" for="executor">执行人：</label>
+				<div class="form-group">
+					<input class="form-control" type="text" id="executor">
+				</div>
+			</div>
+			<div class="col-md-8 col-md-offset-2">
+				<label class="text-success" for="emails">接收邮件：</label>
+				<div class="form-group">
+					<input class="form-control" type="text" id="emails" v-on:keydown.enter="add" placeholder="输入邮箱按回车或右边点击添加">
+				</div>
+				<p class="text-right">
+					<span class="text-muted">点击添加 </span><button class="btn btn-default" v-on:click="add">+</button>
+				</p>
+				<p>默认接收邮箱：83922673@qq.com</p>
+				<p v-for="(li,ind) in list">接收邮箱：{{li}} <button class="btn btn-default btn-xs" v-on:click="app(ind)">x</button></p>
+			</div>
+			<div class="col-md-8 col-md-offset-2">
+				<br>
+				<p class="text-danger" v-show="tishi">{{tips}}</p>
+				<button id="sub" class="btn btn-success btn-block" v-on:click="demo">开始测试</button>
+			</div>
+			<div class="col-md-8 col-md-offset-2">
+				<code hidden="true">{{picked}}</code><br>
+			</div>
+			<div class="col-md-8 col-md-offset-2">
+				<p class="text-center"><small>©上海鸿洋电子商务有限公司</small></p>
+				<p class="abc">{{abc}}</p>
+			</div>
+		</div>
+	</div>
+	<script>
+		new Vue({
+			el:'.container',
+			data:{
+				picked: false,
+				tips:'',
+				tishi:false,
+				opti:0,
+				countt:'all',
+				skipco:0,
+				abc:'',
+				conti:false,
+				list:[]
+			},
+			watch:{
+				countt:function(val,oldVal){
+					if(val != 'all'){
+						this.conti = 'disabled';
+						this.picked = false;
+					}else{
+						this.conti = false;
+						this.countt = 'all';
+					}
+					this.skipco = 0;
+				},
+				picked:function(val,oldVal){
+					if(val == false){
+						this.skipco = 0;
+					}
+				}
+			},
+			methods:{
+				demo:function(){
+					var self = this;
+					var browser = document.getElementById('browser').value;
+					var count = document.getElementById('count').value;
+					var skip = document.getElementById('skip').value;
+					var executor = document.getElementById('executor').value;
+					var emais = '';
+					for(var i = 0;i < self.list.length;i++){
+						emais += self.list[i]+'-';
+					}
+					if (executor == ''){
+						self.tishi = true;
+						self.tips = '执行人未填写';
+						setTimeout(function(){self.tishi = false;},800);
+					}else{
+						if(executor.length >= 10){
+							self.tishi = true;
+							self.tips = '执行人填写错误';
+							setTimeout(function(){self.tishi = false;},800);
+						}else{
+							var queren = window.confirm('确认提交测试吗？')
+							if(queren == true){
+								axios.get('http://192.168.6.106:8080/request.py?o='+Math.random()+'&browser='+browser+'&count='+count+'&skip='+skip+'&executor='+executor+'&emais='+emais).then(function(response){
+									// console.log(response.data)
+									if(response.data.result == "success"){
+										alert('执行完成！')
+									}else if(response.data.result == "error"){
+										self.tishi = true;
+										self.tips = "正在执行中，请稍后！";
+										setTimeout(function(){self.tishi = false;},2000);
+									}
+									// self.abc = response.data;
+								});
+							}else{
+								self.tishi = true;
+								self.tips = '取消执行！';
+								setTimeout(function(){self.tishi = false;},800);
+							}
+						}
+					}
+				},
+				add:function(){
+					var x = document.getElementById('emails').value;
+					var self = this;
+					if (x) {
+						if (new RegExp('^([a-zA-Z0-9_.-])+@([a-zA-Z0-9-])+((\.[a-zA-Z0-9-]{2,3}){1,2})$').test(x)){
+							function contains(arr, obj){
+								var a = true;
+								for(var i = 0; i < arr.length; i++){
+									if(arr[i] == obj){
+										a = false
+									}
+								}
+								return a;
+							}
+							if (contains(self.list,x)){
+								if (x.indexOf('。') != -1) {
+									self.tishi = true;
+									self.tips = '邮箱格式不符合要求！';
+									setTimeout(function(){self.tishi = false;},800);
+								}else{
+									self.list.push(x);
+								}
+							}else{
+								self.tishi = true;
+								self.tips = '邮箱已存在！';
+								setTimeout(function(){self.tishi = false;},800);
+							}
+						}else{
+							self.tishi = true;
+							self.tips = '邮箱格式不符合要求！';
+							setTimeout(function(){self.tishi = false;},800);
+						}
+					}else{
+						self.tishi = true;
+						self.tips = '未填写邮箱！';
+						setTimeout(function(){self.tishi = false;},800);
+					}
+				},
+				app:function(ind){
+					this.list.splice(ind,1)
+				},
+				getData:function(){
+					var self = this;
+			    	axios.get('http://192.168.6.106:8080/request.py?q='+Math.random()).then(function(response){self.opti = response.data;})
+				}
+			},
+			mounted:function(){
+				this.$nextTick(function(){
+					this.getData();
+				})
+			}
+		})
+	</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">	
+	<link rel="stylesheet" href="lib/bootstrap.min.css">
+	<script src="lib/vue.js"></script>
+	<script src="lib/axios.js"></script>
+	<title>自动化测试数据</title>
+</head>
+<body>
+	<div class="container">		
+		<div class="row">
+			<div class="col-md-12">
+				<div class="page-header">
+					<h1>自动化测试数据</h1>
+					<h6 class="text-right"><a href="control.html">开始自动化测试</a></h6>
+				</div>
+			</div>			
+			<div class="col-md-12">
+				<table class="table table-striped">
+					<tr>
+						<th>序号</th>
+						<th>项目名</th>
+						<th>测试结果</th>
+						<th>通过率</th>
+						<th>套件数量</th>
+						<th>用例数量</th>
+						<th>开始时间</th>
+						<th>结束时间</th>
+						<th>耗费时间</th>
+						<th>文件号</th>
+						<th>唯一ID</th>
+						<th>测试报告</th>
+						<th>测试人员</th>
+					</tr>
+					<tbody v-for="(item,index) in reportlist">
+						<tr v-bind:class="item.result == 'pass' ? 'success' : 'danger' ">
+							<th>{{index+1}}</th>
+							<td>{{item.pro_name}}</td>
+							<td>{{item.result}}</td>
+							<td>{{item.rate}}</td>
+							<td>{{item.suite_size}}</td>
+							<td>{{item.case_size}}</td>
+							<td>{{getLocalTime(item.starttime)}}</td>
+							<td>{{getLocalTime(item.endtime)}}</td>
+							<td>{{Number(item.tasktime).toFixed(2)}}(s)</td>
+							<td>{{item.filenumber}}</td>
+							<td>{{item.groupedmd5.toLowerCase()}}</td>
+							<td><a v-bind:href="'/report/'+item.reporturl" target="_blank">{{item.report}}</a></td>
+							<td>{{item.personnel}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-md-12">
+				<code>{{picked}}</code><br>
+			</div>
+			<div class="col-md-12">
+				<p class="text-center">
+					<small>©上海鸿洋电子商务有限公司</small>
+				</p>
+			</div>
+		</div>
+	</div>
+	<script>
+		new Vue({
+			el:'.container',
+			data:{
+				picked:'',
+				reportlist:{}
+			},
+			methods:{
+				getLocalTime:function (nS){
+			       return new Date(parseInt(nS) * 1000).toLocaleString().substr(0,20);
+			    },
+			    demo:function(){
+			    	var self = this;
+			    	axios.get('http://192.168.6.106:8080/request.py?p='+Math.random()).then(function(response){self.reportlist = response.data.result;})
+			    }
+			},
+			mounted:function(){
+				this.$nextTick(function(){
+					this.demo()
+				});
+			}
+		})
+	</script>
+</body>
+</html>
